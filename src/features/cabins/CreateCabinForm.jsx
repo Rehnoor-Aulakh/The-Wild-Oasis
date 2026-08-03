@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import PropTypes from "prop-types";
