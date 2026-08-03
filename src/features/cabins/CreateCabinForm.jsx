@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import PropTypes from "prop-types";
@@ -8,13 +8,18 @@ import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
-import { createEditCabin } from "../../services/apiCabins";
 import FormRow from "../../ui/FormRow";
+import useCreateCabin from "./useCreateCabin";
+import useEditCabin from "./useEditCabin";
 
 export default function CreateCabinForm({ cabinToEdit = {} }) {
+  const { isEditing, editCabin } = useEditCabin();
+  const { isCreating, createCabin } = useCreateCabin();
+  const isWorking = isEditing || isCreating;
+
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
-  const queryClient = useQueryClient();
+
   const {
     register,
     handleSubmit,
@@ -25,37 +30,6 @@ export default function CreateCabinForm({ cabinToEdit = {} }) {
     defaultValues: isEditSession ? editValues : {},
   });
 
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
-    mutationFn: ({ cabinData, id }) => createEditCabin(cabinData, id),
-    onSuccess: () => {
-      toast.success(
-        isEditSession
-          ? "Cabin edited successfully"
-          : "Cabin created successfully",
-      );
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset(isEditSession ? editValues : {});
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success(
-        isEditSession
-          ? "Cabin edited successfully"
-          : "Cabin created successfully",
-      );
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      reset(isEditSession ? editValues : {});
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
-  const isWorking = isEditing;
   function onSubmit(data) {
     const image = typeof data.image === "string" ? data.image : data.image?.[0];
     if (isEditSession) {
@@ -64,9 +38,21 @@ export default function CreateCabinForm({ cabinToEdit = {} }) {
           cabinData: { ...data, image },
           id: editId,
         },
+        {
+          onSuccess: (data) => {
+            reset();
+          },
+        },
       );
     } else {
-      createCabin({ ...data, image });
+      createCabin(
+        { ...data, image },
+        {
+          onSuccess: (data) => {
+            reset();
+          },
+        },
+      );
     }
   }
   function onError(errors) {
