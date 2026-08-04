@@ -2,7 +2,6 @@ import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
 import useSettings from "./useSettings";
-import Button from "../../ui/Button";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import Spinner from "../../ui/Spinner";
