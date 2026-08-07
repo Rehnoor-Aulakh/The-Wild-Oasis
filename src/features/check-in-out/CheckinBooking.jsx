@@ -6,8 +6,14 @@ import Heading from "../../ui/Heading";
 import ButtonGroup from "../../ui/ButtonGroup";
 import Button from "../../ui/Button";
 import ButtonText from "../../ui/ButtonText";
-
+import Checkbox from "../../ui/Checkbox";
 import { useMoveBack } from "../../hooks/useMoveBack";
+import useBooking from "../bookings/useBooking";
+import Spinner from "../../ui/Spinner";
+import { useEffect, useState } from "react";
+import { formatCurrency } from "../../utils/helpers";
+import useCheckin from "./useCheckin";
+import { toast } from "react-hot-toast";
 
 const Box = styled.div`
   /* Box */
@@ -19,9 +25,13 @@ const Box = styled.div`
 
 function CheckinBooking() {
   const moveBack = useMoveBack();
-
-  const booking = {};
-
+  const { checkin, isCheckingIn } = useCheckin();
+  const [confirmPaid, setConfirmPaid] = useState(false);
+  const { booking, isLoading } = useBooking();
+  useEffect(() => {
+    setConfirmPaid(booking?.isPaid || false);
+  }, [booking]);
+  if (isLoading) return <Spinner />;
   const {
     id: bookingId,
     guests,
@@ -31,7 +41,15 @@ function CheckinBooking() {
     numNights,
   } = booking;
 
-  function handleCheckin() {}
+  function handleCheckin() {
+    if (!confirmPaid) {
+      toast.error(
+        "You must confirm that the guest has paid before checking in.",
+      );
+      return;
+    }
+    checkin(bookingId);
+  }
 
   return (
     <>
@@ -41,9 +59,24 @@ function CheckinBooking() {
       </Row>
 
       <BookingDataBox booking={booking} />
-
+      <Box>
+        <Checkbox
+          checked={confirmPaid}
+          disabled={booking?.isPaid || isCheckingIn}
+          onChange={() => setConfirmPaid((confirm) => !confirm)}
+        >
+          I confirm that {guests.fullName} has paid the total amount of{" "}
+          {formatCurrency(totalPrice)} for {numNights} night(s) and {numGuests}{" "}
+          guest(s)
+        </Checkbox>
+      </Box>
       <ButtonGroup>
-        <Button onClick={handleCheckin}>Check in booking #{bookingId}</Button>
+        <Button
+          onClick={handleCheckin}
+          disabled={confirmPaid === false || booking?.isPaid || isCheckingIn}
+        >
+          Check in booking #{bookingId}
+        </Button>
         <Button variation="secondary" onClick={moveBack}>
           Back
         </Button>
