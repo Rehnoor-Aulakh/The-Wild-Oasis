@@ -12,6 +12,11 @@ import { useMoveBack } from "../../hooks/useMoveBack";
 import useBooking from "./useBooking";
 import Spinner from "../../ui/Spinner";
 import { useNavigate } from "react-router-dom";
+import useCheckout from "../check-in-out/useCheckout";
+import Modal from "../../ui/Modal";
+import ConfirmDelete from "../../ui/ConfirmDelete";
+import { HiTrash } from "react-icons/hi2";
+import useDeleteBooking from "./useDeleteBooking";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -19,10 +24,12 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
-function BookingDetail() {
+export default function BookingDetail() {
+  const { deleteBookingService, isDeleting } = useDeleteBooking();
   const { booking, isLoading } = useBooking();
   const moveBack = useMoveBack();
   const navigate = useNavigate();
+  const { checkout, isCheckingOut } = useCheckout();
   if (isLoading) {
     return <Spinner />;
   }
@@ -44,19 +51,45 @@ function BookingDetail() {
       </Row>
 
       <BookingDataBox booking={booking} />
-
-      <ButtonGroup>
-        {status === "unconfirmed" && (
-          <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
-            Check In
+      <Modal>
+        <ButtonGroup>
+          {status === "unconfirmed" && (
+            <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
+              Check In
+            </Button>
+          )}
+          {status === "checked-in" && (
+            <Button
+              onClick={() => {
+                checkout(bookingId);
+              }}
+              disabled={isCheckingOut}
+            >
+              Check Out
+            </Button>
+          )}
+          <Modal.Open opens="delete">
+            <Button variation="danger">Delete booking</Button>
+          </Modal.Open>
+          <Modal.Window name="delete">
+            <ConfirmDelete
+              resourceName="booking"
+              disabled={isDeleting}
+              onConfirm={() => {
+                deleteBookingService(bookingId, {
+                  onSettled: () => {
+                    navigate(-1 );
+                  },
+                });
+                navigate("/bookings");
+              }}
+            />
+          </Modal.Window>
+          <Button variation="secondary" onClick={moveBack}>
+            Back
           </Button>
-        )}
-        <Button variation="secondary" onClick={moveBack}>
-          Back
-        </Button>
-      </ButtonGroup>
+        </ButtonGroup>
+      </Modal>
     </>
   );
 }
-
-export default BookingDetail;

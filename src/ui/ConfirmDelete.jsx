@@ -21,6 +21,15 @@ const StyledConfirmDelete = styled.div`
 `;
 
 function ConfirmDelete({ resourceName, onConfirm, disabled, onCloseModal }) {
+  const handleConfirm = async () => {
+    try {
+      await onConfirm();
+      onCloseModal?.();
+    } catch {
+      // The mutation hook already shows the error toast.
+    }
+  };
+
   return (
     <StyledConfirmDelete>
       <Heading as="h3">Delete {resourceName}</Heading>
@@ -33,7 +42,7 @@ function ConfirmDelete({ resourceName, onConfirm, disabled, onCloseModal }) {
         <Button variation="secondary" disabled={disabled} onClick={onCloseModal}>
           Cancel
         </Button>
-        <Button variation="danger" disabled={disabled} onClick={onConfirm}>
+        <Button variation="danger" disabled={disabled} onClick={handleConfirm}>
           Delete
         </Button>
       </div>
