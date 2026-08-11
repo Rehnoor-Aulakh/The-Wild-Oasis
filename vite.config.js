@@ -6,6 +6,7 @@ import eslint from "vite-plugin-eslint";
 export default defineConfig({
   plugins: [react(), eslint({ failOnError: false })],
   server: {
+    port: 5176,
     hmr: {
       overlay: false,
     },
