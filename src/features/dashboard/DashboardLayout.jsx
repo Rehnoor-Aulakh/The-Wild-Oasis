@@ -16,18 +16,14 @@ const StyledDashboardLayout = styled.div`
 `;
 
 export default function DashboardLayout() {
-  const { bookings, isLoading, error } = useRecentBooking();
+  const { bookings, isLoading } = useRecentBooking();
   const {
     confirmedStays,
     isLoading: isLoadingStays,
-    error: errorStays,
+
     numDays,
   } = useRecentStays();
-  const {
-    cabins,
-    isLoading: isLoadingCabins,
-    error: errorCabins,
-  } = useCabins();
+  const { cabins, isLoading: isLoadingCabins } = useCabins();
   if (isLoading || isLoadingStays || isLoadingCabins) return <Spinner />;
   console.log(bookings);
   console.log(confirmedStays);

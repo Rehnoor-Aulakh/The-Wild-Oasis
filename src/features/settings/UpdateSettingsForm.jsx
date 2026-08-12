@@ -9,7 +9,6 @@ import useUpdateSetting from "./useUpdateSetting";
 export default function UpdateSettingsForm() {
   const {
     isLoading,
-    error,
     settings: {
       minBookingLength,
       maxBookingLength,
@@ -19,9 +18,7 @@ export default function UpdateSettingsForm() {
   } = useSettings();
   const { isUpdating, updateSetting } = useUpdateSetting();
   const {
-    register,
     handleSubmit,
-    reset,
     getValues,
     formState: { errors },
   } = useForm({
