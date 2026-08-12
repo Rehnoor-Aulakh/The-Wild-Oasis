@@ -17,6 +17,7 @@ import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { HiTrash } from "react-icons/hi2";
 import useDeleteBooking from "./useDeleteBooking";
+import Empty from "../../ui/Empty";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ export default function BookingDetail() {
   if (isLoading) {
     return <Spinner />;
   }
+  if (!booking) return <Empty resourceName="booking" />;
   const { status, id: bookingId } = booking;
 
   const statusToTagName = {
@@ -78,7 +80,7 @@ export default function BookingDetail() {
               onConfirm={() => {
                 deleteBookingService(bookingId, {
                   onSettled: () => {
-                    navigate(-1 );
+                    navigate(-1);
                   },
                 });
                 navigate("/bookings");
