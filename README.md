@@ -4,6 +4,8 @@ The Wild Oasis is a comprehensive internal hotel management application designed
 
 This application is built with a focus on performance, robust state management, and an intuitive user experience.
 
+https://the-wild-oasis-by-rehnoor.netlify.app
+
 ## Features
 
 - **Dashboard & Analytics:** View key performance indicators, recent activity, and booking statistics visualized through interactive charts.
